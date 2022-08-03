@@ -1,0 +1,24 @@
+generator db {
+  provider  = "prisma-client-py"
+  interface = "asyncio"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:password@localhost:5432/plv_directory?schema=public"
+}
+
+model courses {
+  course_id   Int        @id(map: "courses_pk") @default(autoincrement())
+  course_name String     @db.VarChar(256)
+  subjects    subjects[]
+}
+
+model subjects {
+  subject_id          String  @id(map: "subjects_pk") @unique(map: "subjects_subject_id_uindex") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subject_code        String? @db.VarChar(64)
+  subject_title       String? @db.VarChar(256)
+  subject_description String? @db.VarChar(1024)
+  student_course      Int     @default(1)
+  courses             courses @relation(fields: [student_course], references: [course_id], onDelete: NoAction, map: "subjects_courses_course_id_fk")
+}
